@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qhit.parking.dao.ParkMapper">
+  <resultMap id="BaseResultMap" type="com.qhit.parking.entity.Park">
+    <constructor>
+      <idArg column="id" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="name" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="price" javaType="java.lang.Double" jdbcType="DOUBLE" />
+      <arg column="status" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="parkaddr" javaType="java.lang.String" jdbcType="VARCHAR" />
+    </constructor>
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from park
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.qhit.parking.entity.Park">
+    insert into park ( name, price,
+      status, parkaddr)
+    values (#{name,jdbcType=VARCHAR}, #{price,jdbcType=DOUBLE},
+      #{status,jdbcType=INTEGER}, #{parkaddr,jdbcType=VARCHAR})
+  </insert>
+  <insert id="batchInsert" parameterType="com.qhit.parking.entity.Park">
+    insert into park ( name, price,
+      status, parkaddr)
+    values
+    <foreach collection="list" item="list" separator=",">
+    (#{list.name,jdbcType=VARCHAR}, #{list.price,jdbcType=DOUBLE},
+      #{list.status,jdbcType=INTEGER}, #{list.parkaddr,jdbcType=VARCHAR})
+    </foreach>
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.qhit.parking.entity.Park">
+    update park
+    set name = #{name,jdbcType=VARCHAR},
+      price = #{price,jdbcType=DOUBLE},
+      status = #{status,jdbcType=INTEGER},
+      parkaddr = #{parkaddr,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateStatusBuyById">
+    update park
+    set status = 1
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateStatusVacantById">
+     update park
+    set status = 0
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select id, name, price, status, parkaddr
+    from park
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select id, name, price, status, parkaddr
+    from park
+
+  </select>
+</mapper>

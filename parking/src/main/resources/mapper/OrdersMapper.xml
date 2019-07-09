@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qhit.parking.dao.OrdersMapper">
+  <resultMap id="BaseResultMap" type="com.qhit.parking.entity.Orders">
+    <constructor>
+      <idArg column="id" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="code" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="user_id" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="park_id" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="createDate" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+      <arg column="status" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="total" javaType="java.lang.Double" jdbcType="DOUBLE" />
+      <arg column="endDate" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+      <arg column="sumpark" javaType="java.lang.Integer" jdbcType="INTEGER" />
+    </constructor>
+    <association property="user" javaType="com.qhit.parking.entity.User">
+      <constructor>
+        <idArg column="id" javaType="java.lang.Integer" jdbcType="INTEGER" />
+        <arg column="name" javaType="java.lang.String" jdbcType="VARCHAR" />
+        <arg column="password" javaType="java.lang.String" jdbcType="VARCHAR" />
+        <arg column="phone" javaType="java.lang.String" jdbcType="VARCHAR" />
+        <arg column="plate_num" javaType="java.lang.String" jdbcType="VARCHAR" />
+        <arg column="stauts" javaType="java.lang.Integer" jdbcType="INTEGER" />
+        <arg column="createDate" javaType="java.util.Date" jdbcType="DATE" />
+        <arg column="point" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      </constructor>
+    </association>
+    <association property="park" javaType="com.qhit.parking.entity.Park">
+      <constructor>
+        <idArg column="id" javaType="java.lang.Integer" jdbcType="INTEGER" />
+        <arg column="name" javaType="java.lang.String" jdbcType="VARCHAR" />
+        <arg column="price" javaType="java.lang.Double" jdbcType="DOUBLE" />
+        <arg column="status" javaType="java.lang.Integer" jdbcType="INTEGER" />
+        <arg column="parkaddr" javaType="java.lang.String" jdbcType="VARCHAR" />
+      </constructor>
+    </association>
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from orders
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.qhit.parking.entity.Orders">
+    insert into orders ( code, user_id,
+      park_id, createDate, status, 
+      total, endDate, sumpark
+      )
+    values ( #{code,jdbcType=VARCHAR}, #{userId,jdbcType=INTEGER},
+      #{parkId,jdbcType=INTEGER},SYSDATE(), 0,
+      #{total,jdbcType=DOUBLE}, #{enddate,jdbcType=TIMESTAMP}, #{sumpark,jdbcType=INTEGER}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.qhit.parking.entity.Orders">
+    update orders
+    set code = #{code,jdbcType=VARCHAR},
+      user_id = #{userId,jdbcType=INTEGER},
+      park_id = #{parkId,jdbcType=INTEGER},
+      createDate = #{createdate,jdbcType=TIMESTAMP},
+      status = #{status,jdbcType=INTEGER},
+      total = #{total,jdbcType=DOUBLE},
+      endDate = #{enddate,jdbcType=TIMESTAMP},
+      sumpark = #{sumpark,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="selectOrderByid" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select o.id, o.code, o.user_id, o.park_id, o.createDate, o.status, o.total, o.endDate, o.sumpark,
+    u.id,  u.name,  u.password,  u.phone,  u.plate_num,  u.stauts,  u.createDate, u.point,
+    p.id, p.name, p.price, p.status, p.parkaddr
+    from orders o,user u,park p
+    WHERE o.park_id=p.id AND o.user_id=u.id AND o.id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select o.id, o.code, o.user_id, o.park_id, o.createDate, o.status, o.total, o.endDate, o.sumpark,
+    u.id,  u.name,  u.password,  u.phone,  u.plate_num,  u.stauts,  u.createDate, u.point,
+    p.id, p.name, p.price, p.status, p.parkaddr
+    from orders o,user u,park p
+    WHERE o.park_id=p.id AND o.user_id=u.id
+  </select>
+    <select id="selectByUser_id" resultType="com.qhit.parking.entity.Orders">
+    select id, code, user_id, park_id, createDate, status, total, endDate, sumpark
+    from orders
+    where user_id = #{uid,jdbcType=INTEGER}
+    </select>
+  <select id="findOrderByKey" resultMap="BaseResultMap">
+    select o.id, o.code, o.user_id, o.park_id, o.createDate, o.status, o.total, o.endDate, o.sumpark,
+    u.id,  u.name,  u.password,  u.phone,  u.plate_num,  u.stauts,  u.createDate, u.point,
+    p.id, p.name, p.price, p.status, p.parkaddr
+    from orders o,user u,park p
+    WHERE o.park_id=p.id AND o.user_id=u.id
+      <if test=" keyTmp!=null and  keyTmp!=''">
+        AND (u.name LIKE concat("%",#{keyTmp},"%") or u.plate_num LIKE concat("%",#{keyTmp},"%"))
+      </if>
+
+  </select>
+  <select id="findOrdersByUid" resultMap="BaseResultMap">
+    select o.id, o.code, o.user_id, o.park_id, o.createDate, o.status, o.total, o.endDate, o.sumpark,
+    u.id,  u.name,  u.password,  u.phone,  u.plate_num,  u.stauts,  u.createDate, u.point,
+    p.id, p.name, p.price, p.status, p.parkaddr
+    from orders o,user u,park p
+	WHERE o.park_id=p.id AND o.user_id=u.id AND o.user_id=#{uid}
+  </select>
+
+</mapper>

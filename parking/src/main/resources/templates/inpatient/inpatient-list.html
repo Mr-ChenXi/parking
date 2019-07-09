@@ -1,0 +1,132 @@
+﻿<!DOCTYPE HTML>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:include="/common/head :: commonHead('病人信息')">
+</head>
+
+<body>
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 考试管理 <span
+        class="c-gray en">&gt;</span> 病人信息
+    <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px"
+       href="javascript:location.replace(location.href);" title="刷新"><i id="shuaxin"
+                                                                        class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="page-container">
+    <div class="text-c">
+        <form action="/inpatient/findInpatientByKey" method="post">
+            病人姓名：<input type="text" th:value="${keyTmp}" class="input-text" style="width:250px" placeholder="输入病人姓名"
+                   name="patientName"/>
+             状态： <select class="select-box select size-M" name="status" style="width: 15%;">
+                <option value="0" selected>默认</option>
+                <option value="1" >在院</option>
+                <option value="2">出院</option>
+              </select>
+            <button type="submit" class="btn btn-success" id="" name=""><i class="Hui-iconfont">&#xe665;</i> 搜索
+            </button>
+        </form>
+    </div>
+    <div class="cl pd-5 bg-1 bk-gray mt-20">
+	<span class="l">
+	<a href="javascript:;" onclick="inpatient_add('添加病人','/inpatient/inpatient-add','800','400')"
+       class="btn btn-primary radius">
+
+	<i class="Hui-iconfont">&#xe600;</i> 添加病人</a></span>&nbsp;&nbsp;
+        <a href="/inpatient/hidden"   class="btn btn-primary radius">
+
+            <i class="Hui-iconfont">&#xe600;</i> 隐藏出院</a></span>&nbsp;
+        <a href="/inpatient/show"  class="btn btn-primary radius">
+
+            <i class="Hui-iconfont">&#xe600;</i> 显示出院</a></span>
+        <span class="r">共有数据：<strong th:text="${carNum}"></strong> 条</span></div>
+    <table class="table table-border table-bordered table-bg table-sort">
+        <thead><!---->
+        <tr>
+            <th scope="col" colspan="9">患者列表</th>
+        </tr>
+        <tr class="text-c">
+            <th width="25"><input type="checkbox" name="" value=""></th>
+            <th width="45">序号</th>
+            <th width="100">病人姓名</th>
+            <th width="100">性别</th>
+            <th width="100">出生日期</th>
+            <th width="100">床号</th>
+            <th width="100">消费金额</th>
+            <th width="100">状态</th>
+            <th width="100">操作111</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="text-c" th:each="inpatient,carStat : ${Inpatient}" >
+
+            <td>
+                <input type="checkbox" name="userstate" id="userstate" th:value="${inpatient.patientId}">
+
+            </td>
+            <td>
+                <span th:text="${carStat.index+1}"></span>
+                <input type="hidden" th:value="${inpatient.patientId}" class="inp"/>
+            </td>
+            <td th:text="${inpatient.patientName}"></td>
+            <td th:text="${inpatient.sex}"></td>
+
+            <td th:text="${#calendars.format(inpatient.birth,'yyyy-MM-dd')}"></td>
+            <td th:text="${inpatient.bedNum}"></td>
+
+            <span th:if="${inpatient.amount}==${maxAmount}">
+            <td  class="yellow" th:text="${inpatient.amount}"></td>
+            </span>
+            <span th:if="${inpatient.amount}!=${maxAmount}">
+            <td th:text="${inpatient.amount}" ></td>
+            </span>
+            <td class="td-status">
+                <span class="label label-success radius" th:if="${inpatient.status==1}">在院</span>
+                <span class="label radius" th:if="${inpatient.status==2}">出院</span>
+            </td>
+            <td>
+                <a title="删除" href="javascript:;" onclick="car_del(this)"
+                   class="ml-5" style="text-decoration:none"><i class="Hui-iconfont">&#xe6e2;</i></a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- 引入公共js -->
+<span th:include="/common/on-load-js :: commonOnLoadJs"></span>
+<script type="text/javascript" th:src="@{/lib/My97DatePicker/4.8/WdatePicker.js}"></script>
+<script type="text/javascript" th:src="@{/lib/datatables/1.10.0/jquery.dataTables.min.js}"></script>
+
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript">
+ $(function () {
+     $(".yellow").parent().css("background-color","yellow")
+ })
+
+    function inpatient_add(title, url, w, h) {
+        layer_show(title, url, w, h);
+    }
+
+
+    function car_del(obj) {
+        layer.confirm('确认要删除吗？', function (index) {
+            var parkId = $(obj).parents("tr").find(".inp").val();
+            console.log(parkId);
+            $.ajax({
+                type: 'POST',
+                url: '/park/park-delete',
+                data: {"parkId": parkId},
+                dataType: 'json',
+                success: function (data) {
+                    console.log(data);
+                    if (data.res == 0) {
+                        $(obj).parents("tr").remove();
+                        layer.msg('已删除!', {icon: 1, time: 1000});
+                        parent.$('#shuaxin').click();
+                    } else {
+                        layer.msg('操作失败!', {icon: 2, time: 1000});
+                    }
+                }
+            });
+        });
+    }
+</script>
+</body>
+</html>

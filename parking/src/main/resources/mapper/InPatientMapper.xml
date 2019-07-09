@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qhit.parking.dao.InPatientMapper">
+  <resultMap id="BaseResultMap" type="com.qhit.parking.entity.InPatient">
+    <constructor>
+      <idArg column="patient_id" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="patient_name" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="sex" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="birth" javaType="java.util.Date" jdbcType="DATE" />
+      <arg column="bed_num" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="amount" javaType="java.lang.Double" jdbcType="DOUBLE" />
+      <arg column="status" javaType="java.lang.Integer" jdbcType="INTEGER" />
+    </constructor>
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from in_patient
+    where patient_id = #{patientId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.qhit.parking.entity.InPatient">
+    insert into in_patient ( patient_name, sex,
+      birth, bed_num, amount, 
+      status)
+    values ( #{patientName,jdbcType=VARCHAR}, #{sex,jdbcType=VARCHAR},
+      #{birth,jdbcType=DATE}, #{bedNum,jdbcType=VARCHAR}, #{amount,jdbcType=DOUBLE}, 
+      #{status,jdbcType=INTEGER})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.qhit.parking.entity.InPatient">
+    update in_patient
+    set patient_name = #{patientName,jdbcType=VARCHAR},
+      sex = #{sex,jdbcType=VARCHAR},
+      birth = #{birth,jdbcType=DATE},
+      bed_num = #{bedNum,jdbcType=VARCHAR},
+      amount = #{amount,jdbcType=DOUBLE},
+      status = #{status,jdbcType=INTEGER}
+    where patient_id = #{patientId,jdbcType=INTEGER}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select patient_id, patient_name, sex, birth, bed_num, amount, status
+    from in_patient
+    where patient_id = #{patientId,jdbcType=INTEGER}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select  patient_id, patient_name, sex, birth, bed_num, amount, status
+    from in_patient
+    ORDER BY LENGTH(bed_num),bed_num
+  </select>
+    <select id="findInpatientByKey" resultMap="BaseResultMap">
+      select patient_id, patient_name, sex, birth, bed_num, amount, status
+      from in_patient
+      <where>
+        <if test="patientName !=null and  patientName !=''">
+         AND patient_name LIKE  concat("%",#{patientName},"%")
+        </if>
+        <if test="status !=null and status != 0 ">
+         and status = #{status}
+        </if>
+      </where>
+      ORDER BY LENGTH(bed_num),bed_num
+    </select>
+  <select id="getBedNum" resultMap="BaseResultMap">
+    select patient_id, patient_name, sex, birth, bed_num, amount, status
+      from in_patient
+      WHERE  status=1
+      ORDER BY LENGTH(bed_num),bed_num
+  </select>
+  <select id="hidden" resultMap="BaseResultMap">
+    select patient_id, patient_name, sex, birth, bed_num, amount, status
+      from in_patient
+      WHERE  status=1
+      ORDER BY LENGTH(bed_num),bed_num
+  </select>
+  <select id="show" resultMap="BaseResultMap">>
+     select patient_id, patient_name, sex, birth, bed_num, amount, status
+      from in_patient
+      WHERE  status=2
+      ORDER BY LENGTH(bed_num),bed_num
+  </select>
+  <select id="getMaxAmount" resultType="com.qhit.parking.entity.InPatient">
+     select max(amount) AS maxAmount
+    from in_patient
+  </select>
+</mapper>
